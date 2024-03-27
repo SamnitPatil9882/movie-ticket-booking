@@ -21,17 +21,18 @@ export const movieShowApi = createApi({
     getMovieShows: builder.query<MovieShow[], void>({
       query: () => "movie_shows",
     }),
+
     getMovieShow: builder.query<MovieShow, number>({
       query: (id) => `movie_shows/${id}`,
     }),
 
-    //   getMovie: builder.query<Movie, number>({
-    //     query: (id) => `movies/${id}`,
-    //   }),
+    getMovieShowsByTheaterId: builder.query<MovieShow[],number>({
+      query: (id) => `theaters/${id}/movie_shows_by_theater_id`,
+    }),
 
-    // getMovies: builder.query<Movie[],void>({
-    //     query: () => 'movies',
-    // })
+    getMovieShowByTheaterId: builder.query<MovieShow,number>({
+      query: (id) => `movie_in_theaters/${id}`,
+    })
   }),
 });
 
@@ -40,4 +41,6 @@ export const {
   useGetMovieShowQuery,
   // useGetMovieQuery,
   // useGetMoviesQuery,
+  useGetMovieShowByTheaterIdQuery,
+  useGetMovieShowsByTheaterIdQuery
 } = movieShowApi;

@@ -25,7 +25,21 @@ export const movieApi = createApi({
 
     getMovies: builder.query<Movie[],void>({
         query: () => 'movies',
-    })
+    }),
+
+    createMovie: builder.mutation<Movie,Movie>({
+      query: (data) => ({
+        url: 'tickets',
+        method: 'POST',
+        body: data,
+      }),
+      transformResponse: (response: any) => {
+        console.log("in transform: ",response);
+        return response}, // Access the 'data' property
+      transformErrorResponse: (error: any) => error.status, // Adjust this according to the structure of your API error response
+      invalidatesTags: ['Movie'], 
+    }),
+    
     
   }),
 }); 

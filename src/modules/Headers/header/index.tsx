@@ -20,7 +20,7 @@ function Header() {
   return (
     <CardHeader className="w-full flex justify-between items-center bg-black border-b-2 border-gray-800 p-4 sticky top-0 z-10">
       <div className="w-20">
-        <img src="logo.png" alt="logoImage" className="logo-img rounded-full" />
+        <img src="spLogo.jpg" alt="logoImage" className="rounded-full transform scale-150" />
       </div>
       <div className="flex space-x-4">
         <div

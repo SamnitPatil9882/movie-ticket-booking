@@ -8,6 +8,9 @@ import Protected from "../../Components/AuthLayout";
 import { Provider } from "react-redux";
 import store from "../../app/store";
 import MovieInfo from "../movieInfo";
+import MovieAvailTheater from "../movieTheaters";
+import BookTicket from "../BookTicket";
+import AdminDashboard from "../AdminDashboard";
 
 function MovieTicketBookApp() {
   return (
@@ -41,11 +44,35 @@ function MovieTicketBookApp() {
             }
           />
           <Route
+            // path="/movie-info/:movieShowId"
             path="/movie-info/:movieId"
+
             element={
               <Protected authentication={true}>
-                <MovieInfo />
+                <MovieInfo/>
               </Protected>
+            }
+          />
+          <Route
+            path="/movie-avail-theater/:movieId"
+            element={
+              <Protected authentication={true}>
+                <MovieAvailTheater />
+              </Protected>
+            }
+          />
+          <Route
+            path="/book-ticket/:movieShowId"
+            element={
+              <Protected authentication={true}>
+                <BookTicket />
+              </Protected>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <AdminDashboard/>
             }
           />
         </Routes>

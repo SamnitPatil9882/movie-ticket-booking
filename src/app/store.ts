@@ -4,6 +4,9 @@ import moviesReducer from "./store/movieSlice";
 import { authApi } from "../modules/Auth/api";
 import { movieShowApi } from "./api/movieShows";
 import { movieApi } from "./api/moviApi";
+import { movieInTheaterApi } from "./api/movieInTheater";
+import { theaterApi } from "./api/theater";
+import { ticketApi } from "./api/ticket";
 
 // Load persisted state from local storage
 const persistedState = localStorage.getItem("reduxState");
@@ -17,6 +20,9 @@ const rootReducer = combineReducers({
   [authApi.reducerPath]: authApi.reducer,
   [movieShowApi.reducerPath]: movieShowApi.reducer,
   [movieApi.reducerPath]: movieApi.reducer,
+  [movieInTheaterApi.reducerPath]: movieInTheaterApi.reducer,
+  [theaterApi.reducerPath]: theaterApi.reducer,
+  [ticketApi.reducerPath]: ticketApi.reducer,
   auth: authReducer,
   movies: moviesReducer,
 });
@@ -28,7 +34,7 @@ const store = configureStore({
     auth: preloadedAuthState,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, movieShowApi.middleware,movieApi.middleware),
+    getDefaultMiddleware().concat(authApi.middleware, movieShowApi.middleware,movieApi.middleware,movieInTheaterApi.middleware,theaterApi.middleware,ticketApi.middleware),
   devTools: process.env.NODE_ENV !== 'production', // Enable devtools only in non-production environment
 });
 
