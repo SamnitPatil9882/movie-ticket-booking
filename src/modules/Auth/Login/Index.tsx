@@ -12,9 +12,13 @@ import { login as authLogin } from "../../../app/authSlice";
 import { useDispatch } from "react-redux";
 import { log } from "console";
 
-const initialValues: LoginCredentials = {
-  // email: "",
-  id: -1,
+interface LoginFormValues {
+  id: string;
+  password: string;
+}
+
+const initialValues: LoginFormValues = {
+  id: "",
   password: "",
 };
 
@@ -25,33 +29,7 @@ function Login() {
   const [api, contextHolder] = notification.useNotification();
 
   const [login, { isLoading, isSuccess, error, data }] = useLoginMutation();
-  // console.log(
-  //   "isLoading: ",
-  //   isLoading,
-  //   " isSuccess: ",
-  //   isSuccess,
-  //   " isError: ",
-  //   error,
-  //   " data: ",
-  //   data
-  // );
-
-  // useEffect(() => {
-  //   console.log("data:");
-    
-  //   console.log({data});
-  //   console.log(data?.data);
-  //   console.log(data?.data.user);
-    
-    
-  //   if (isSuccess && data && data.data && data.data.user) { // Check if data and data.user exist
-  //     console.log("in useEffect");
-      
-  //     const userData = data.data.user;
-  //     dispatch(authLogin({ userData }));
-  //     navigate("/home");
-  //   }
-  // }, [data, dispatch, navigate]); 
+ 
   useEffect(() => {
     if (isSuccess && data && data.user) {
       const userData = data.user;
@@ -59,37 +37,34 @@ function Login() {
       dispatch(authLogin({ userData }));
       navigate("/home");
     }
+    else if(error){
+      api.open({
+        message: 'Enter Valid Credentials',
+      });
+    }
   }, [isSuccess, data, dispatch, navigate]);
 
   const validationSchema = LoginCredentialsValidationSchema;
 
-  const { handleChange, handleSubmit, values, errors } = useFormik({
+  const { handleChange, handleSubmit, values, errors, touched, handleBlur } = useFormik({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
       try {
         const response: UserResponse = await login(values).unwrap();
         console.log("response: ", response);
+        
       } catch (error) {
         console.log("Login error:", error);
+        api.open({
+          message: 'Enter Valid Credentials',
+        });
       }
     },
   });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
-      {/* {error && <div>Error occured</div>}
-      {isPending && <div>Pending</div>}
-      {isSuccess && <div>Success</div>} */}
-      {/* <ToastContainer/> */}
-
-      {/* {showToast && (
-        <div className="fixed bottom-0 right-0 mb-4 mr-4">
-          <div className="bg-red-500 text-white py-2 px-4 rounded-lg shadow-md">
-            An error occurred while logging in. Please try again later.
-          </div>
-        </div>
-      )} */}
       {contextHolder}
       <div className="flex justify-center items-center w-full">
         <div className="quote-container flex justify-center items-center w-1/2">
@@ -111,7 +86,7 @@ function Login() {
             onSubmit={handleSubmit}
             className="bg-black p-12 rounded-lg shadow-lg border-2 border-gray-700 focus:border-red-500"
           >
-            <h2 className="text-white text-4xl font-bold mb-8">Sign In</h2>
+            <h2 className="text-white text-5xl font-bold mb-8">Sign In</h2>
             <FormGroup className="mb-6">
               <Label htmlFor="exampleUserId" className="sr-only">
                 User Id
@@ -122,14 +97,12 @@ function Login() {
                 value={values.id}
                 name="id"
                 onChange={handleChange}
+                onBlur={handleBlur}
                 className="bg-gray-800 text-white w-full p-4 rounded-md mb-4 focus:outline-none focus:ring focus:border-red-500"
                 placeholder="User Id"
               />
+              {touched.id && errors.id && <div className="text-red-500">{errors.id}</div>}
             </FormGroup>
-
-            {errors.id && (
-              <div className="text-red-500">{errors.id as string}</div>
-            )}
 
             <FormGroup className="mb-6">
               <Label htmlFor="examplePassword" className="sr-only">
@@ -141,20 +114,20 @@ function Login() {
                 value={values.password}
                 name="password"
                 onChange={handleChange}
+                onBlur={handleBlur}
                 className="bg-gray-800 text-white w-full p-4 rounded-md mb-4 focus:outline-none focus:ring focus:border-red-500"
                 placeholder="Password"
               />
+              {touched.password && errors.password && <div className="text-red-500">{errors.password}</div>}
             </FormGroup>
-            {errors.password && (
-              <div className="text-red-500">{errors.password as string}</div>
-            )}
             <Button
+              disabled={isLoading}
               type="submit"
-              className="bg-red-500 text-white py-4 px-8 rounded-md hover:bg-red-600 transition duration-300 ease-in-out w-full"
+              className="bg-red-500 text-white py-4 px-8 rounded-md hover:bg-red-600 transition duration-300 ease-in-out w-full font-bold text-2xl"
             >
-              Sign In
+              {isLoading?"Submitting":"Submit"}
             </Button>
-            <p className="mt-4 text-sm text-gray-400">
+            <p className="mt-4 text-lg text-gray-400">
               Don't have an account?{" "}
               <Link to="/signup" className="text-white">
                 Sign up now

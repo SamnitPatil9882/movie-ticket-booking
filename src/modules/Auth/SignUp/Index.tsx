@@ -96,43 +96,11 @@ function Signup() {
             onSubmit={handleSubmit}
             className="bg-black p-12 rounded-lg shadow-lg border-2 border-gray-700 focus:border-red-500"
           >
-            <h2 className="text-white text-4xl font-bold mb-8">Sign Up</h2>
+            <h2 className="text-white text-5xl font-bold mb-8 ">Sign Up</h2>
             {/* Select Role section */}
-            <FormGroup className="mb-6">
-              <Label htmlFor="role" className="text-white mb-2 block">
-                Select Role:
-              </Label>
-              <div className="flex items-center">
-                <div className="mr-4">
-                  <Input
-                    type="radio"
-                    id="admin"
-                    name="role"
-                    value={ values.role}
-                    checked={values.role === Role.admin}
-                    onBlur={handleFieldBlur}
-                    onChange={() => handleChange({ target: { name: 'role', value: Role.admin } })}                  />
-                  <Label htmlFor="admin" className="text-white ml-2">
-                    Admin
-                  </Label>
-                </div>
-                <div>
-                  <Input
-                    type="radio"
-                    id="user"
-                    name="role"
-                    value={values.role}
-                    checked={values.role === Role.user}
-                    onBlur={handleFieldBlur}
-                    onChange={() => handleChange({ target: { name: 'role', value: Role.user } })}                  />
-                  <Label htmlFor="user" className="text-white ml-2">
-                    User
-                  </Label>
-                </div>
-              </div>
-            </FormGroup>
+           
             <FormGroup className="mb-4">
-              <Label htmlFor="name" className="text-white mb-2 block">
+              <Label htmlFor="name" className="text-white mb-2 block text-left font-bold text-xl">
                 Name:
               </Label>
               <Input
@@ -151,7 +119,7 @@ function Signup() {
             </FormGroup>
             {/* Render error message for age */}
             <FormGroup className="mb-4">
-              <Label htmlFor="age" className="text-white mb-2 block">
+              <Label htmlFor="age" className="text-white mb-2 block text-left font-bold text-xl">
                 Age:
               </Label>
               <Input
@@ -170,7 +138,7 @@ function Signup() {
             </FormGroup>
             {/* Render error message for phone */}
             <FormGroup className="mb-4">
-              <Label htmlFor="phone" className="text-white mb-2 block">
+              <Label htmlFor="phone" className="text-white mb-2 block text-left font-bold text-xl">
                 Phone Number:
               </Label>
               <Input
@@ -189,7 +157,7 @@ function Signup() {
             </FormGroup>
             {/* Render error message for password */}
             <FormGroup className="mb-4">
-              <Label htmlFor="password" className="text-white mb-2 block">
+              <Label htmlFor="password" className="text-white mb-2 block text-left font-bold text-xl">
                 Password:
               </Label>
               <Input
@@ -215,7 +183,7 @@ function Signup() {
             >
               <Label
                 htmlFor="confirmPassword"
-                className="text-white mb-2 block"
+                className="text-white mb-2 block text-left font-bold text-xl"
               >
                 Confirm Password:
               </Label>
@@ -239,12 +207,12 @@ function Signup() {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="bg-red-500 text-white py-4 px-8 rounded-md hover:bg-red-600 transition duration-300 ease-in-out w-full"
+              className="bg-red-500 text-white py-4 px-8 rounded-md hover:bg-red-600 transition duration-300 ease-in-out w-full font-bold text-2xl"
             >
               Sign Up
             </Button>
             {/* Link to Login */}
-            <p className="mt-4 text-sm text-gray-400">
+            <p className="mt-4 text-lg text-gray-400">
               Already have an account?{" "}
               <Link to="/login" className="text-white">
                 Log in here

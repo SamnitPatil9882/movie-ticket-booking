@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Button, Card, Input, InputNumber, Rate } from "antd";
+import { Avatar, Button, Card, Input, InputNumber, Rate, notification } from "antd";
 import Header from "../Headers/header";
 import {
   EditOutlined,
@@ -9,7 +9,7 @@ import {
 import Meta from "antd/es/card/Meta";
 import { useGetMovieShowQuery } from "../../app/api/movieShows";
 import { useGetMovieQuery } from "../../app/api/moviApi";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Label } from "reactstrap";
 import { PaymentMode } from "./types";
 import { useCreateTicketMutation } from "../../app/api/ticket";
@@ -17,7 +17,8 @@ import { TicketRequestBody } from "../../app/api/types";
 import { useSelector } from "react-redux";
 import { number } from "yup";
 import { extractStars, formatTime } from "../../utils/helper";
-const MovieInfo = () => {
+const BookTicket = () => {
+  const [api, contextHolder] = notification.useNotification();
   const { movieShowId } = useParams<{ movieShowId?: string }>();
   const [bookTicket, setBookTicket] = useState<Boolean>(false);
   const [paymentMode, setPaymentMode] = useState<PaymentMode>(
@@ -27,7 +28,7 @@ const MovieInfo = () => {
   const [premiumSeatCount, setPremiumSeatCount] = useState<number>(0);
   const [standardSeatCount, setStandardSeatCount] = useState<number>(0);
   const [availabel, setAvailabel] = useState<Boolean>(true);
-  const [createTicket, { isLoading, isSuccess, error, data }] =
+  const [createTicket, { isLoading:ticketIsLoading, isSuccess:ticketIsSuccess, error:ticketError, data:ticketData }] =
     useCreateTicketMutation();
   const {
     data: movieShow,
@@ -35,8 +36,7 @@ const MovieInfo = () => {
     isLoading: movieShowLoading,
   } = useGetMovieShowQuery(movieShowId ? parseInt(movieShowId) : 1);
 
-  const compareTime = (showTime: string):Boolean => {
-
+  const compareTime = (showTime: string): Boolean => {
     const showTimeDate = new Date(showTime);
     const currentTime = new Date();
     if (showTimeDate <= currentTime) {
@@ -44,12 +44,24 @@ const MovieInfo = () => {
     } else {
       return true;
     }
-  }
-  // useEffect(() =>{
-  //   if(movieShow)
-  //   // setAvailabel(compareTime(movieShow?.show_start_time))
-    
-  // },[movieShow])
+  };
+  useEffect(() =>{
+    if(movieShow)
+    setAvailabel(compareTime(movieShow?.show_start_time))
+
+  },[movieShow])
+
+  useEffect(()=>{
+
+  },[ticketData,ticketError])
+
+  useEffect(() => {
+    // Reset seat counts to 0 after component mount
+    setVIPSeatCount(0);
+    setPremiumSeatCount(0);
+    setStandardSeatCount(0);
+  }, []);
+
   // Fetch data for the movie
   const {
     data: movie,
@@ -57,28 +69,55 @@ const MovieInfo = () => {
     isLoading: movieLoading,
   } = useGetMovieQuery(movieShow ? movieShow.movie_id : 1);
 
-  
   const userData = useSelector((state: any) => state.auth.userData);
 
+  const seatTypeArray = Array.from({ length: vipSeatCount }, () => "vip")
+  .concat(Array.from({ length: premiumSeatCount }, () => "premium"))
+  .concat(Array.from({ length: standardSeatCount }, () => "standard"));
   const handleBookTicket = () => {
     if (movieShow) {
       const movieTicketReq: TicketRequestBody = {
         ticket: {
           payment_mode: paymentMode,
-          seat_book: 1,
+          seat_book: vipSeatCount + premiumSeatCount + standardSeatCount,
           user_id: userData.id,
           movie_show_id: movieShow?.id,
-          seat_type: ["vip"],
+          seat_type:seatTypeArray,
         },
       };
       const ticketreqresp = createTicket(movieTicketReq).unwrap();
       console.log("ticketResponse; ", ticketreqresp);
     }
   };
+
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (ticketIsSuccess) {
+      navigate("/my-tickets");
+    } else if (ticketError) {
+      let errorMessage = 'Unknown error';
+      
+      if ('base' in ticketError && Array.isArray(ticketError.base)) {
+        errorMessage = ticketError.base[0]; // If error is from FetchBaseQueryError
+      } else if ('message' in ticketError) {
+        errorMessage = ticketError.message || 'Unknown error'; // If error is from SerializedError
+      } else if (typeof ticketError === 'string') {
+        errorMessage = ticketError; // If error is a string
+      }
+      
+      api.open({
+        message: 'Notification Title',
+        description: errorMessage,
+        duration: 0,
+      });
+    }
+  }, [ticketData, ticketError, ticketIsSuccess]);
+  
   return (
     <div className="min-h-screen bg-black">
       <Header />
       <div className="text-white flex items-center justify-center ">
+        {contextHolder}
         {movie && movieShow && (
           <div>
             <div className="flex w-full justify-center">
@@ -88,12 +127,7 @@ const MovieInfo = () => {
                   hoverable
                   //   onClick={() => navigate(`/movie-info/${movieShow.id}`)}
                   style={{ width: 240 }}
-                  cover={
-                    <img
-                      alt="example"
-                      src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-                    />
-                  }
+                  cover={<img alt="example" src={movie.img_url} />}
                 >
                   <Meta
                     title={movie?.title}
@@ -126,21 +160,51 @@ const MovieInfo = () => {
                       <div className="text-lg">{movieShow.seat_count}</div>
 
                       <div className="text-lg font-bold">Show Start Time:</div>
-                      <div className="text-lg">{formatTime(movieShow.show_start_time)}</div>
-                    
+                      <div className="text-lg">
+                        {formatTime(movieShow.show_start_time)}
+                      </div>
+
                       <div className="text-lg font-bold">Show End Time:</div>
-                      <div className="text-lg">{formatTime(movieShow.show_end_time)}</div>
+                      <div className="text-lg">
+                        {formatTime(movieShow.show_end_time)}
+                      </div>
 
                       <div className="text-lg font-bold">Seat Type:</div>
                       <div className="text-lg">
-                        <span className="text-white">
-                          VIP: {movieShow.seat_type_price.vip} -{" "}
-                          {movieShow.seat_type_count.vip} | Premium:{" "}
-                          {movieShow.seat_type_price.premium} -{" "}
-                          {movieShow.seat_type_count.premium} | Standard:{" "}
-                          {movieShow.seat_type_price.standard} -{" "}
-                          {movieShow.seat_type_count.standard}
-                        </span>
+                        <div className="text-white">
+                          <div className="flex">
+                            <div className="w-1/3 font-bold">Type</div>
+                            <div className="w-1/3 font-bold">Price</div>
+                            <div className="w-1/3 font-bold">Count</div>
+                          </div>
+                          <div className="flex">
+                            <div className="w-1/3">VIP</div>
+                            <div className="w-1/3">
+                              {movieShow.seat_type_price.vip}
+                            </div>
+                            <div className="w-1/3">
+                              {movieShow.seat_type_count.vip}
+                            </div>
+                          </div>
+                          <div className="flex">
+                            <div className="w-1/3">Premium</div>
+                            <div className="w-1/3">
+                              {movieShow.seat_type_price.premium}
+                            </div>
+                            <div className="w-1/3">
+                              {movieShow.seat_type_count.premium}
+                            </div>
+                          </div>
+                          <div className="flex">
+                            <div className="w-1/3">Standard</div>
+                            <div className="w-1/3">
+                              {movieShow.seat_type_price.standard}
+                            </div>
+                            <div className="w-1/3">
+                              {movieShow.seat_type_count.standard}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -150,12 +214,14 @@ const MovieInfo = () => {
                         onClick={() => setBookTicket((prev) => !prev)}
                         className="flex items-center justify-center bg-white text-2xl p-2"
                       >
-                        {bookTicket ? "Cancel Ticket" : "Book Now"}
+                        {bookTicket ? "Cancel booking.." : "Book Now"}
                       </Button>
                     )}
-                    {
-                      !availabel && <div className="text-red-500 font-bold text-xl">Movie show is not available</div>
-                    }
+                    {!availabel && (
+                      <div className="text-red-500 font-bold text-xl">
+                        Movie show is not available
+                      </div>
+                    )}
                   </div>
                 </div>
                 {/* <div className="flex flex-col bg-gray-800">
@@ -194,7 +260,7 @@ const MovieInfo = () => {
               </div> */}
               </div>
             </div>
-            {availabel && bookTicket  && (
+            {availabel && bookTicket && (
               <div>
                 <div>
                   <div className="flex flex-col bg-gray-800">
@@ -312,4 +378,4 @@ const MovieInfo = () => {
   );
 };
 
-export default MovieInfo;
+export default BookTicket;

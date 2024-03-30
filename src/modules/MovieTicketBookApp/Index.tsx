@@ -11,6 +11,7 @@ import MovieInfo from "../movieInfo";
 import MovieAvailTheater from "../movieTheaters";
 import BookTicket from "../BookTicket";
 import AdminDashboard from "../AdminDashboard";
+import MyTickets from "../MyTickets";
 
 function MovieTicketBookApp() {
   return (
@@ -19,7 +20,7 @@ function MovieTicketBookApp() {
         {/* <LoginHeader /> */}
         <Routes>
           <Route path="/" element={<Landing />} />
-            <Route
+          <Route
             path="/home"
             element={
               <Protected authentication={true}>
@@ -46,10 +47,9 @@ function MovieTicketBookApp() {
           <Route
             // path="/movie-info/:movieShowId"
             path="/movie-info/:movieId"
-
             element={
               <Protected authentication={true}>
-                <MovieInfo/>
+                <MovieInfo />
               </Protected>
             }
           />
@@ -72,7 +72,17 @@ function MovieTicketBookApp() {
           <Route
             path="/admin-dashboard"
             element={
-              <AdminDashboard/>
+              <Protected authentication={true}>
+                <AdminDashboard />
+              </Protected>
+            }
+          />
+           <Route
+            path="/my-tickets"
+            element={
+              <Protected authentication={true}>
+                <MyTickets />
+              </Protected>
             }
           />
         </Routes>

@@ -19,7 +19,9 @@ export const ticketApi = createApi({
   tagTypes: ['Ticket'],
   endpoints: (builder) => ({
 
-
+    getTickets: builder.query<Ticket[], void>({
+      query: () => "tickets",
+    }),
     
     createTicket: builder.mutation<Ticket, TicketRequestBody>({
         query: (data) => ({
@@ -37,4 +39,4 @@ export const ticketApi = createApi({
   }),
 }); 
 
-export const { useCreateTicketMutation } = ticketApi;
+export const { useCreateTicketMutation, useGetTicketsQuery } = ticketApi;

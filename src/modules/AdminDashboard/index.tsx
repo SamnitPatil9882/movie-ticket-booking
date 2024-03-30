@@ -3,6 +3,7 @@ import Header from "../Headers/header";
 import { Tabs } from "antd";
 import TabPane from "antd/es/tabs/TabPane";
 import Movie from "./components/tabs/Movie";
+import UserTab from "./components/tabs/User";
 
 function AdminDashboard() {
   return (
@@ -17,7 +18,7 @@ function AdminDashboard() {
           tabBarStyle={{ backgroundColor: 'rgb(45,45,45)' }} // Background color of tabs
         >
           <TabPane tab={<span className="text-white font-bold text-xl">User</span>} key="1">
-            User Information
+            <UserTab/>
           </TabPane>
           <TabPane tab={<span className="text-white font-bold text-xl">Movie</span>} key="2">
             <Movie/>

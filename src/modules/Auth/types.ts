@@ -1,6 +1,6 @@
 export interface LoginCredentials {
   // email: string;
-  id: number;
+  id: number| string;
   password: string;
 }
 
@@ -13,6 +13,17 @@ export interface User{
     role_id: number;
     created_at: string;
     updated_at: string;
+}
+
+export interface UserGet{
+  id: number;
+  name: string;
+  age: number;
+  phone_no: string;
+  password_digest: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserResponse {

@@ -17,6 +17,9 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
+
+        
+
         login: (state, action: PayloadAction<{ userData: User }>) => {
             state.status = true;
             state.userData = action.payload.userData;
@@ -30,6 +33,7 @@ const authSlice = createSlice({
             state.status = false;
             state.userData = null;
         }
+
     }
 });
 

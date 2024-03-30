@@ -1,3 +1,5 @@
+import { useSelector } from "react-redux";
+
 export   function formatTime(timeString: string): string {
     const options: Intl.DateTimeFormatOptions = {
       weekday: "long",
@@ -16,3 +18,8 @@ export   function formatTime(timeString: string): string {
     const match = stars.match(/\d+/);
     return match ? parseInt(match[0]) : 0;
   }
+
+  // export function getSignedInUserId():number{
+  //   const authUserData = useSelector((state: any) => state.auth.userData)
+  //   return authUserData? authUserData.id : 0
+  // }

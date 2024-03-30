@@ -50,13 +50,16 @@ export interface Movie {
   title: string;
   stars: string;
   description: string;
+  img_url:string;
 }
 
 export interface MovieCreateReq {
+  id:number;
   user_id: number;
   title: string;
   stars: string;
   description: string;
+  img_url:string;
 }
 
 export interface MovieUpdateReq {
@@ -106,14 +109,14 @@ export interface TheaterCreateReq {
 ///ticket
 
 export interface Ticket {
-  ticket: {
+//   ticket: {
     id: number;
     payment_mode: string;
     seat_book: number;
     user_id: number;
     movie_show_id: number;
     seat_type: string[];
-  };
+  // };
 }
 export interface TicketRequestBody {
   ticket: {

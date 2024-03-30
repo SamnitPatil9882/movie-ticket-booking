@@ -1,13 +1,22 @@
-import React from "react";
-import { useGetMovieQuery } from "../../../../../../app/api/moviApi";
+import React, { useEffect } from "react";
+import {
+  useCreateMovieMutation,
+  useGetMovieQuery,
+  useUpdateMovieMutation,
+} from "../../../../../../app/api/moviApi";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Rate } from "antd";
+import { Rate, notification } from "antd";
 import { extractStars } from "../../../../../../utils/helper";
+import { Movie } from "../../../../../../app/api/types";
+import { useSelector } from "react-redux";
 
 function Edit({ editId }: { editId: number }) {
+  const [api, contextHolder] = notification.useNotification();
+  const authUserData = useSelector((state: any) => state.auth.userData)
   const { data: movie, error, isLoading } = useGetMovieQuery(editId);
-
+  const [updateMovie, { error: updateError, isLoading: updateIsLoading, isSuccess:editSuccess }] =
+    useUpdateMovieMutation();
   const editValidationSchema = Yup.object().shape({
     id: Yup.number().required("ID is required"),
     title: Yup.string().required("Title is required"),
@@ -16,12 +25,27 @@ function Edit({ editId }: { editId: number }) {
       .min(0, "Stars must be at least 0")
       .max(5, "Stars must be at most 5"),
     description: Yup.string().required("Description is required"),
+    img_url: Yup.string()
+      .url("Invalid URL format")
+      .required("Image URL is required"),
   });
 
   let exstars;
   if (movie) {
     exstars = extractStars(movie?.stars);
   }
+  useEffect(()=>{
+    if(editSuccess){
+      api.open({
+        message: 'Movie Updated Successfully',
+      })
+    }else if(updateError){
+      api.open({
+        message: 'Got an error in updating the movie',
+        description:"Enter valid Data"
+      })
+    }
+  },[updateError,updateIsLoading,editSuccess,api])
 
   const initialValues = movie
     ? {
@@ -29,21 +53,34 @@ function Edit({ editId }: { editId: number }) {
         title: movie.title,
         stars: exstars,
         description: movie.description || "",
+        img_url: movie.img_url || "",
       }
     : {
         id: "",
         title: "",
         stars: "",
         description: "",
+        img_url: "",
       };
 
   const formik = useFormik({
     initialValues: initialValues,
     enableReinitialize: true,
     validationSchema: editValidationSchema,
-    onSubmit: (values, { setSubmitting }) => {
-      console.log(values);
-      setSubmitting(false);
+    onSubmit: async (values) => {
+      try {
+        const response: Movie = await updateMovie({
+          id: values.id as number,
+          title: values.title,
+          stars: values.stars as string,
+          description: values.description,
+          img_url: values.img_url,
+          user_id:authUserData.id
+        }).unwrap();
+        console.log("response: ", response);
+      } catch (error) {
+        console.log("Login error:", error);
+      }
     },
   });
 
@@ -52,22 +89,22 @@ function Edit({ editId }: { editId: number }) {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-semibold mb-8 text-white">Edit Movie</h1>
+    <div className="container mx-auto p-4 bg-gray-800">
+      {contextHolder}
       {movie && (
         <form
           onSubmit={formik.handleSubmit}
           className="max-w-md mx-auto border-white border-2 p-2 rounded-lg"
         >
-          <div className="mb-6">
-            <label htmlFor="id" className="block text-white mb-2">
+          <div className="mb-6 ">
+            <label htmlFor="id" className="block text-white mb-2 text-lg">
               ID:
             </label>
             <input
               type="number"
               id="id"
               name="id"
-              disabled= {true}
+              disabled={true}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.id}
@@ -80,7 +117,7 @@ function Edit({ editId }: { editId: number }) {
             ) : null}
           </div>
           <div className="mb-6">
-            <label htmlFor="title" className="block text-white mb-2">
+            <label htmlFor="title" className="block text-white mb-2 text-lg">
               Title:
             </label>
             <input
@@ -90,7 +127,7 @@ function Edit({ editId }: { editId: number }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.title}
-              className="form-input mt-1 block w-full rounded-md bg-gray-800 text-white px-4 py-2"
+              className="form-input mt-1 block w-full rounded-md bg-gray-800 text-white px-4 py-2 text-lg"
             />
             {formik.touched.title && formik.errors.title ? (
               <div className="text-red-500 text-sm mt-1">
@@ -99,7 +136,7 @@ function Edit({ editId }: { editId: number }) {
             ) : null}
           </div>
           <div className="mb-6">
-            <label htmlFor="stars" className="block text-white mb-2">
+            <label htmlFor="stars" className="block text-white mb-2 text-lg">
               Stars:
             </label>
             <input
@@ -115,8 +152,12 @@ function Edit({ editId }: { editId: number }) {
             />
             <div className="flex items-center">
               <Rate
-               value={typeof formik.values.stars === 'string' ? parseInt(formik.values.stars) : formik.values.stars}
-               // Update Rate component value
+                value={
+                  typeof formik.values.stars === "string"
+                    ? parseInt(formik.values.stars)
+                    : formik.values.stars
+                }
+                // Update Rate component value
                 onChange={(value) => formik.setFieldValue("stars", value)} // Update formik value on Rate change
                 className="text-2xl mr-2"
               />
@@ -131,7 +172,7 @@ function Edit({ editId }: { editId: number }) {
             ) : null}
           </div>
           <div className="mb-6">
-            <label htmlFor="description" className="block text-white mb-2">
+            <label htmlFor="description" className="block text-white mb-2 text-lg">
               Description:
             </label>
             <textarea
@@ -140,11 +181,30 @@ function Edit({ editId }: { editId: number }) {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.description}
-              className="form-textarea mt-1 block w-full rounded-md bg-gray-800 text-white px-4 py-2"
+              className="form-textarea mt-1 block w-full rounded-md bg-gray-800 text-white px-4 py-2 text-lg"
             />
             {formik.touched.description && formik.errors.description ? (
               <div className="text-red-500 text-sm mt-1">
                 {formik.errors.description}
+              </div>
+            ) : null}
+          </div>
+          <div className="mb-6">
+            <label htmlFor="img_url" className="block text-white mb-2 text-lg">
+              Image URL:
+            </label>
+            <input
+              type="text"
+              id="img_url"
+              name="img_url"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.img_url}
+              className="form-input mt-1 block w-full rounded-md bg-gray-800 text-white px-4 py-2 text-lg"
+            />
+            {formik.touched.img_url && formik.errors.img_url ? (
+              <div className="text-red-500 text-sm mt-1">
+                {formik.errors.img_url}
               </div>
             ) : null}
           </div>

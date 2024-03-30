@@ -6,60 +6,38 @@ import { MovieShow } from "../../../app/api/types";
 
 const { Meta } = Card;
 
-// function MovieCard({ movieShow }: { movieShow: MovieShow }) {
-  function MovieCard({ movieId }: { movieId: number }) {
-
-
+function MovieCard({ movieId }: { movieId: number }) {
   const {
     data: movie,
     error,
     isLoading,
   } = useGetMovieQuery(movieId);
+  
   const navigate = useNavigate();
+
   function extractStars(stars: string): number {
     const match = stars.match(/\d+/);
     return match ? parseInt(match[0]) : 0;
   }
+
   return (
     <div>
       {isLoading && <div>Loading...</div>}
       {error && (
         <div className="">
-          <div>Error occured</div>
-
-          <div>
-            <Card
-              className="m-5"
-              hoverable
-              onClick={() => navigate(`/movie-info/${movieId}`)}
-              style={{ width: 240 }}
-              cover={
-                <img
-                  alt="example"
-                  src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-                />
-              }
-            >
-              <Meta
-                title="Demo Movie"
-                description={
-                  <Rate disabled defaultValue={extractStars("4 stars")} />
-                }
-              />
-            </Card>
-          </div>
+          <div>Error occurred</div>
         </div>
       )}
       {movie && (
         <Card
-          className="m-5"
+          className="m-5 transition-transform duration-300 transform hover:scale-110"
           hoverable
           onClick={() => navigate(`/movie-info/${movieId}`)}
-          style={{ width: 240 }}
+          style={{ width: 300 }}
           cover={
             <img
               alt="example"
-              src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+              src={movie.img_url}
             />
           }
         >

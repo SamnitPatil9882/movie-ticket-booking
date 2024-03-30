@@ -66,13 +66,13 @@ function MovieInfo() {
 
       {/* Check if movie and movie show data are available */}
       {movie && (
-        <div className="flex justify-center items-center mt-8 ">
+        <div className="flex flex-col justify-center items-center mt-8 ">
           {/* Container for movie details */}
-          <div className="max-w-3xl bg-gray-800 rounded-lg overflow-hidden shadow-lg flex w-1/2">
+          <div className="max-w-3xl bg-gray-800 rounded-lg overflow-hidden shadow-lg flex w-full">
             {/* Movie image */}
             <div className="flex w-full">
               <img
-                src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+                src={movie.img_url}
                 alt={movie.title}
                 className="w-full object-cover"
               />
@@ -85,17 +85,17 @@ function MovieInfo() {
               <Descriptions bordered column={1} size="small" layout="vertical">
                 {/* Stars */}
                 <Descriptions.Item
-                  label={<span className="text-white font-bold">Stars</span>}
+                  label={<span className="text-white font-bold text-xl">Stars</span>}
                 >
-                  <Rate disabled defaultValue={extractStars(movie.stars)} />
+                  <Rate className="text-3xl" disabled defaultValue={extractStars(movie.stars)} />
                 </Descriptions.Item>
                 {/* Description */}
                 <Descriptions.Item
                   label={
-                    <span className="text-white font-bold">Description</span>
+                    <span className="text-white font-bold text-xl">Description</span>
                   }
                 >
-                  <p className="text-white font-bold">{movie.description}</p>
+                  <p className="text-white font-bold text-xl">{movie.description}</p>
                 </Descriptions.Item>
                 {/* Show Start Time */}
                 {/* <Descriptions.Item
@@ -145,56 +145,13 @@ function MovieInfo() {
           </div>
           {/* Container for theaters with scroll */}
           {showTheaterList && (
-            <div className="w-1/3 pl-4 overflow-y-auto">
+            <div className="w-full pl-4 overflow-y-auto">
               <div className="text-white">
                 <h2 className="text-3xl font-bold mb-4">Movie Show</h2>
                 {/* Iterate over theater data */}
                 {
                   movieShowsBymovieId && (
-                    // theaterByMovieShow.map((theater: Theater) => (
-                    // <div
-                    //   key={theater.id}
-                    //   className="border rounded m-4 p-4 bg-gray-900"
-                    // >
-                    //   <div className="mb-2">
-                    //     <span className="font-bold">Name:</span>{" "}
-                    //     <span className="ml-2">{theater.name}</span>
-                    //   </div>
-                    //   <div className="mb-2">
-                    //     <span className="font-bold">Location:</span>{" "}
-                    //     <span className="ml-2">{theater.location}</span>
-                    //   </div>
-                    //   <div className="mb-2">
-                    //     <span className="font-bold">City:</span>{" "}
-                    //     <span className="ml-2">{theater.city}</span>
-                    //   </div>
-                    // </div>
-                    // <InfiniteScroll
-                    //   dataLength={theaterByMovieShow.length}
-                    //   next={loadMoreData}
-                    //   hasMore={data.length < 50}
-                    //   loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
-                    //   endMessage={
-                    //     <Divider plain>It is all, nothing more 🤐</Divider>
-                    //   }
-                    //   scrollableTarget="scrollableDiv"
-                    // >
-                    //   <List
-                    //     dataSource={theaterByMovieShow}
-                    //     renderItem={(item) => (
-                    //       <List.Item key={item.email}>
-                    //         <List.Item.Meta
-                    //           avatar={<Avatar src={item.picture.large} />}
-                    //           title={
-                    //             <a href="https://ant.design">{item.name.last}</a>
-                    //           }
-                    //           description={item.email}
-                    //         />
-                    //         <div>Content</div>
-                    //       </List.Item>
-                    //     )}
-                    //   />
-                    // </InfiniteScroll>
+                   
                     <div className="bg-gray-800 text-white">
                       <List
                         className=""
@@ -204,20 +161,20 @@ function MovieInfo() {
                           onChange: (page) => {
                             console.log(page);
                           },
-                          pageSize: 4,
+                          pageSize: 1,
                           className: "text-red", // Set text color to white
                         }}
                         dataSource={movieShowsBymovieId}
                         renderItem={(movieShow) => (
                           <List.Item 
-                          onClick={() => navigate(`/book-ticket/${movieShow.movie_id}`)}
+                          onClick={() => navigate(`/book-ticket/${movieShow.id}`)}
                           key={movieShow.id}>
                             <div
                               key={movieShow.id}
                               className="border rounded p-2 bg-gray-900"
                             >
                               <div className="mb-2">
-                                <span className="font-bold text-white">
+                                <span className="font-bold text-white text-xl">
                                   Screen No.:
                                 </span>{" "}
                                 <span className="ml-2 text-white">
