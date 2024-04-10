@@ -1,0 +1,7 @@
+export {
+    .custom-tabs .ant-tabs-tab {
+        color: white;
+        font-weight: bold;
+      }
+      
+}
